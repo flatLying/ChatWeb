@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import { useRouter } from 'vue-router';
 export default {
   name: 'MyComponent',
   data(){
@@ -48,6 +50,26 @@ export default {
     if (this.getSigninStatusFromIframe() === 'login'){
       alert(this.getSigninEmailFromIframe())
       alert(this.getSigninPasswordFromIframe())
+      axios.post('http://localhost:8080/user/login2', {
+        phone: this.getSigninEmailFromIframe(),
+        password: this.getSigninPasswordFromIframe()
+      })
+      .then(response => {
+        if (response.data.success === true) {
+          // 登录成功，跳转到 /chat
+          alert("login_success")
+          this.$router.push('/chat');
+        } else {
+          // 处理登录失败的情况
+          alert("login_fail")
+          console.log('Login failed:', response.data.data);
+        }
+      })
+      .catch(error => {
+        console.error('Login error:', error);
+        // 处理错误
+      });
+
     }
     else{
       alert(this.getSigninEmailFromIframe())
