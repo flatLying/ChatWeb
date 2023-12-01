@@ -9,16 +9,17 @@
 			left: '50%', /* 水平居中 */
 			transform: 'translate(-50%, -50%)' /* 调整位置以确保真正的居中 */
 		}"
-			:current-user-id="currentUserId"
-			:rooms="JSON.stringify(rooms)"
-			:rooms-loaded="true"
-			:messages="JSON.stringify(messages)"
-		/>
+	  :current-user-id="currentUserId"
+	  :rooms="JSON.stringify(rooms)"
+	  :messages="JSON.stringify(messages)"
+	  :room-actions="JSON.stringify(roomActions)"
+	/>
 </template>
 
 <script>
 import { register } from 'vue-advanced-chat'
 import request from '@/utils/request';
+
 register()
 
   export default {
@@ -37,6 +38,14 @@ register()
     },
 	methods: {
 		
-	}
+	},
+	mounted() {
+		request.get('http://localhost:8080/user/islogin', {
+			//headers:{authorization:sessionStorage.getItem("token")}
+			}).then(function (response) {
+				console.log("服务器响应");
+    			console.log(response);
+  			})
+}
 }
 </script>
