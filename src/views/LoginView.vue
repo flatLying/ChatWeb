@@ -12,8 +12,9 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { useRouter } from 'vue-router';
+import request from '@/utils/request';
+import {useTokenStore} from '@/stores/counter.js';
 export default {
   name: 'MyComponent',
   data(){
@@ -24,7 +25,7 @@ export default {
   },
   // 组件逻辑
   methods: {
-
+    
   setupIframeListener() {
     const iframe = document.getElementById('myIframe');
     iframe.onload = () => {
@@ -44,25 +45,31 @@ export default {
     alert(this.getSignupPasswordFromIframe())
     // 这里可以执行后续操作，比如使用 Axios 发送请求
   },
+  
   handleSignIn(e) {
     e.preventDefault();
 
     if (this.getSigninStatusFromIframe() === 'login'){
       alert(this.getSigninEmailFromIframe())
       alert(this.getSigninPasswordFromIframe())
-      axios.post('http://localhost:8080/user/login2', {
+      const tokenStore=useTokenStore();
+      request.post('http://localhost:8080/user/login2', {
         phone: this.getSigninEmailFromIframe(),
         password: this.getSigninPasswordFromIframe()
       })
       .then(response => {
-        if (response.data.success === true) {
+        console.log("登录响应：");
+        console.log(response);
+        if (response.success === true) {
           // 登录成功，跳转到 /chat
           alert("login_success")
+          // sessionStorage.setItem("token", response.data.data);
+          tokenStore.setToken(response.data);
           this.$router.push('/chat');
         } else {
           // 处理登录失败的情况
           alert("login_fail")
-          console.log('Login failed:', response.data.data);
+          console.log('Login failed:', response.data);
         }
       })
       .catch(error => {
@@ -89,7 +96,7 @@ export default {
     const password = this.getSigninPasswordFromIframe();
 
     // 使用 Axios 发送请求
-    axios.post('YOUR_SERVER_ENDPOINT', {
+    request.post('YOUR_SERVER_ENDPOINT', {
       email: email,
       password: password
     })
@@ -153,7 +160,9 @@ export default {
 
 },
 
-
+setup(){
+  
+},
 
 mounted() {
   this.setupIframeListener();

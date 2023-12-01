@@ -110,6 +110,7 @@ export default {
 	setup(){
 	},
 	mounted() {
+		alert(sessionStorage.getItem("token"))
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response) {
