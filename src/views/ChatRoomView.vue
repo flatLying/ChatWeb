@@ -1,7 +1,6 @@
 <template>
-	<div>
-		<vue-advanced-chat
-		:style="{ 
+	<vue-advanced-chat
+	:style="{ 
 			height: 'calc(100vh - 80px)', 
 			width: '90vw',
 			margin: 'auto', /* 水平和垂直居中 */
@@ -10,100 +9,70 @@
 			left: '50%', /* 水平居中 */
 			transform: 'translate(-50%, -50%)' /* 调整位置以确保真正的居中 */
 		}"
-			:current-user-id="currentUserId"
-			:rooms="JSON.stringify(rooms)"
-			:rooms-loaded="true"
-			:messages="JSON.stringify(messages)"
-			:messages-loaded="messagesLoaded"
-			@send-message="sendMessage($event.detail[0])"
-			@fetch-messages="fetchMessages($event.detail[0])"
-		/>
-	</div>
-</template>
+	  :current-user-id="currentUserId"
+	  :rooms="JSON.stringify(rooms)"
+	  :messages="JSON.stringify(messages)"
+	  :room-actions="JSON.stringify(roomActions)"
+	/>
+  </template>
 
 <script>
-import { register } from 'vue-advanced-chat'
-// import { register } from '../../vue-advanced-chat/dist/vue-advanced-chat.es.js'
-register()
+  import { register } from 'vue-advanced-chat'
+  register()
 
-export default {
-	data() {
-		return {
-			currentUserId: '1234',
-			rooms: [
-				{
-					roomId: '1',
-					roomName: 'Room 1',
-					avatar: 'https://66.media.tumblr.com/avatar_c6a8eae4303e_512.pnj',
-					users: [
-						{ _id: '1234', username: 'John Doe' },
-						{ _id: '4321', username: 'John Snow' }
-					]
-				}
-			],
-			messages: [],
-			messagesLoaded: false
-		}
-	},
+  // Or if you used CDN import
+  // window['vue-advanced-chat'].register()
 
+  export default {
+    data() {
+      return {
+		socket: null,
+        currentUserId: '1234',
+        rooms: [],
+        messages: [],
+        roomActions: [
+          { name: 'inviteUser', title: 'Invite User' },
+          { name: 'removeUser', title: 'Remove User' },
+          { name: 'deleteRoom', title: 'Delete Room' }
+        ]
+      }
+    },
 	methods: {
-		fetchMessages({ options = {} }) {
-			setTimeout(() => {
-				if (options.reset) {
-					this.messages = this.addMessages(true)
-				} else {
-					this.messages = [...this.addMessages(), ...this.messages]
-					this.messagesLoaded = true
-				}
-				this.addNewMessage()
-			})
-		},
+		connect() {
+      this.socket = new WebSocket('ws://localhost:8081/chat');
 
-		addMessages(reset) {
-			const messages = []
+      this.socket.onopen = () => {
+        console.log('WebSocket连接已打开！');
+      };
 
-			for (let i = 0; i < 30; i++) {
-				messages.push({
-					_id: reset ? i : this.messages.length + i,
-					content: `${reset ? '' : 'paginated'} message ${i + 1}`,
-					senderId: '4321',
-					username: 'John Doe',
-					date: '13 November',
-					timestamp: '10:20'
-				})
-			}
+      this.socket.onmessage = (event) => {
+        console.log('收到消息：', event.data);
+      };
 
-			return messages
-		},
+      this.socket.onerror = (error) => {
+        console.error('WebSocket错误：', error);
+      };
 
-		sendMessage(message) {
-			this.messages = [
-				...this.messages,
-				{
-					_id: this.messages.length,
-					content: message.content,
-					senderId: this.currentUserId,
-					timestamp: new Date().toString().substring(16, 21),
-					date: new Date().toDateString()
-				}
-			]
-		},
-
-		addNewMessage() {
-			setTimeout(() => {
-				this.messages = [
-					...this.messages,
-					{
-						_id: this.messages.length,
-						content: 'NEW MESSAGE',
-						senderId: '1234',
-						timestamp: new Date().toString().substring(16, 21),
-						date: new Date().toDateString()
-					}
-				]
-			}, 2000)
-		}
-	}
-}
+      this.socket.onclose = () => {
+        console.log('WebSocket连接已关闭！');
+      };
+    },
+    sendMessage() {
+      if (this.socket.readyState === WebSocket.OPEN) {
+        this.socket.send('你好，WebSocket！');
+      } else {
+        console.log('WebSocket连接未开启！');
+      }
+    }
+		
+	},
+	created() {
+		this.connect()
+	},
+	beforeDestroy() {
+    if (this.socket) {
+      this.socket.close();
+    }
+  },
+  }
 </script>
-
