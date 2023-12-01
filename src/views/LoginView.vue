@@ -67,9 +67,15 @@ export default {
           tokenStore.setToken(response.data);
           this.$router.push('/chat');
         } else {
-          // 处理登录失败的情况
-          alert("login_fail")
-          console.log('Login failed:', response.data);
+          if (response.errorMsg==="用户已经登录"){
+            
+          }else{
+              // 处理登录失败的情况
+            alert("login_fail")
+            console.log('Login failed:', response.data);
+          }
+          
+
         }
       })
       .catch(error => {
