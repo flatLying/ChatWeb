@@ -13,12 +13,15 @@
 	  :rooms="JSON.stringify(rooms)"
 	  :messages="JSON.stringify(messages)"
 	  :room-actions="JSON.stringify(roomActions)"
+	  @send-message="sendMessage($event.detail[0])"
 	/>
 </template>
 
 <script>
 import { register } from 'vue-advanced-chat'
 import request from '@/utils/request';
+import VueNativeSock from 'vue-native-websocket-vue3'
+import {useTokenStore} from '../stores/counter.js';
 
 register()
 
@@ -27,7 +30,47 @@ register()
       return {
 		socket: null,
         currentUserId: '1234',
-        rooms: [],
+        rooms: [
+		{
+    roomId: '1',
+    roomName: 'Room 1',
+    avatar: 'assets/imgs/people.png',
+    unreadCount: 4,
+    index: 3,
+    lastMessage: {
+      _id: 'xyz',
+      content: 'Last message received',
+      senderId: '1234',
+      username: 'John Doe',
+      timestamp: '10:20',
+      saved: true,
+      distributed: false,
+      seen: false,
+      new: true
+    },
+    users: [
+      {
+        _id: '1234',
+        username: 'John Doe',
+        avatar: 'assets/imgs/doe.png',
+        status: {
+          state: 'online',
+          lastChanged: 'today, 14:30'
+        }
+      },
+      {
+        _id: '4321',
+        username: 'John Snow',
+        avatar: 'assets/imgs/snow.png',
+        status: {
+          state: 'offline',
+          lastChanged: '14 July, 20:00'
+        }
+      }
+    ],
+    typingUsers: [ 4321 ]
+  }
+		],
         messages: [],
         roomActions: [
           { name: 'inviteUser', title: 'Invite User' },
@@ -37,6 +80,24 @@ register()
       }
     },
 	methods: {
+		sendMessage(message) {
+			this.messages = [
+				...this.messages,
+				{
+					_id: this.messages.length,
+					content: message.content,
+					senderId: this.currentUserId,
+					timestamp: new Date().toString().substring(16, 21),
+					date: new Date().toDateString(),
+					files: message.files,
+					replyMessage: message.replyMessage
+				}
+			]
+      // 发送消息
+	  console.log(message)
+      this.$socket.sendObj(message);
+
+    }
 		
 	},
 	mounted() {
@@ -46,6 +107,32 @@ register()
 				console.log("服务器响应");
     			console.log(response);
   			})
-}
+			// 获取 token
+			const tokenStore = useTokenStore();
+			let token = tokenStore.token;
+			const wsAddress = `ws://localhost:8081/chat?token=${encodeURIComponent(token)}`;
+
+			this.$connect(wsAddress, {
+			format: 'json',
+			reconnection: true,
+			reconnectionAttempts: 1,
+			reconnectionDelay: 3000,
+			});
+			// 连接 WebSocket
+			// this.$connect();
+
+			// 监听接收消息
+			this.$options.sockets.onmessage = (event) => {
+				console.log(event)
+			if (event.data) {
+				const data = JSON.parse(event.data);
+				console.log(data);
+			}
+			};
+},
+  beforeUnmount() {
+    // 断开 WebSocket 连接
+    this.$disconnect();
+  }
 }
 </script>

@@ -14,6 +14,9 @@ import {createPinia} from 'pinia'
 import { createPersistedState } from 'pinia-persistedstate-plugin'
 import App from './App.vue'
 import router from './router'
+import VueNativeSock from 'vue-native-websocket-vue3'
+import {useTokenStore} from './stores/counter.js';
+
  
 
 const app = createApp(App)
@@ -23,4 +26,20 @@ pinia.use(persist)
 app.use(pinia)
 app.use(router)
 app.use(ElementPlus)
+
+// 假设您的 token 存储在某个变量中
+const tokenStore = useTokenStore();
+let token=tokenStore.token;
+
+// 将 token 作为查询参数添加到 WebSocket URL
+const wsAddress = `ws://localhost:8081/chat?token=${encodeURIComponent(token)}`;
+
+app.use(VueNativeSock, wsAddress, {
+  connectManually: true,
+  format: 'json',
+  reconnection: true, // (Boolean) 是否自动重连
+  reconnectionAttempts: 1, // (Number) 重连次数
+  reconnectionDelay: 3000, // (Number) 重连间隔时间
+});
+
 app.mount('#app')
