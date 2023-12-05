@@ -80,12 +80,15 @@ register()
 		var that=this;
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
-			}).catch((error) => {
-				console.log(error);
-				});
+			})
 			request.post('http://localhost:8080/rooms', {
 			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response) {
+				console.log(response.data)
+				console.log(JSON.stringify(that.rooms) == JSON.stringify(response.data));
+				let agentsList=response.data
+				// console.log(Object.prototype.toString.call(response.data[0]))    
+				// this.rooms.splice(0,response.data.length-1,response.data)
 				that.rooms=response.data
 				// this.rooms=response.data;
   			})

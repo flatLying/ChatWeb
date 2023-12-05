@@ -80,9 +80,7 @@ register()
 		var that=this;
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
-			}).catch((error) => {
-				console.log(error);
-				});
+			})
 			request.post('http://localhost:8080/rooms', {
 			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response) {

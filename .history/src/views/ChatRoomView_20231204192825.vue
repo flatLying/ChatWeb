@@ -37,10 +37,47 @@ register()
 		loadingRooms: false,
 		roomsLoaded: true,
 		roomMessage: '',
-		roomId: '',
-		// roomsLoadedCount: 0,
+		roomId: '1',
 		messagesPerPage: 10,
-        rooms: [],
+        rooms: [{
+			roomId: '1',
+			roomName: 'Room 1',
+			avatar: 'https://www.bing.com/images/search?view=detailV2&ccid=JmgB%2brCO&id=F65AB598884EEDD2EF68FEE4A76A2EA9BEEC677D&thid=OIP.JmgB-rCOyrEBuZCazT8cCAAAAA&mediaurl=https%3a%2f%2fimg2.woyaogexing.com%2f2021%2f04%2f17%2fc242fdada04b440e80ab613175aa3d0e!400x400.jpeg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.266801fab08ecab101b9909acd3f1c08%3frik%3dfWfsvqkuaqfk%252fg%26pid%3dImgRaw%26r%3d0%26sres%3d1%26sresct%3d1%26srh%3d800%26srw%3d800&exph=400&expw=400&q=%e5%a4%b4%e5%83%8f&simid=608044228712822748&FORM=IRPRST&ck=1550D37382E9B9CD6D46D4F42E2956F8&selectedIndex=1&itb=0',
+			unreadCount: 4,
+			index: 3,
+			lastMessage: {
+				_id: 'xyz',
+				content: 'Last message received',
+				senderId: '1234',
+				username: 'John Doe',
+				timestamp: '10:20',
+				saved: true,
+				distributed: false,
+				seen: false,
+				new: true
+				},
+			users: [
+			{
+				_id: '1234',
+				username: 'John Doe',
+				avatar: 'assets/imgs/doe.png',
+				status: {
+				state: 'online',
+				lastChanged: 'today, 14:30'
+				}
+			},
+			{
+				_id: '4321',
+				username: 'John Snow',
+				avatar: 'assets/imgs/snow.png',
+				status: {
+				state: 'offline',
+				lastChanged: '14 July, 20:00'
+				}
+			}
+    		],
+    		typingUsers: [ 4321 ]
+		}],
         messages: [],
         roomActions: [
   		 {name: 'archiveRoom',title: 'Archive Room'},
@@ -71,46 +108,35 @@ register()
     }
 		
 	},
-	// computed: {
-	// 	loadedRooms() {
-	// 		return this.rooms.slice(0, this.roomsLoadedCount)
-	// 	}
-	// },
 	mounted() {
-		var that=this;
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
-			}).catch((error) => {
-				console.log(error);
-				});
-			request.post('http://localhost:8080/rooms', {
-			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response) {
-				that.rooms=response.data
-				// this.rooms=response.data;
+				console.log("服务器响应");
+    			console.log(response);
   			})
-		// 获取 token
-		const tokenStore = useTokenStore();
-		let token = tokenStore.token;
-		const wsAddress = `ws://localhost:8081/chat?token=${encodeURIComponent(token)}`;
+			// 获取 token
+			const tokenStore = useTokenStore();
+			let token = tokenStore.token;
+			const wsAddress = `ws://localhost:8081/chat?token=${encodeURIComponent(token)}`;
 
-		this.$connect(wsAddress, {
-		format: 'json',
-		reconnection: true,
-		reconnectionAttempts: 1,
-		reconnectionDelay: 3000,
-		});
-		// 连接 WebSocket
-		// this.$connect();
+			this.$connect(wsAddress, {
+			format: 'json',
+			reconnection: true,
+			reconnectionAttempts: 1,
+			reconnectionDelay: 3000,
+			});
+			// 连接 WebSocket
+			// this.$connect();
 
-		// 监听接收消息
-		this.$options.sockets.onmessage = (event) => {
-			console.log(event)
-		if (event.data) {
-			const data = JSON.parse(event.data);
-			console.log(data);
-		}
-	};
+			// 监听接收消息
+			this.$options.sockets.onmessage = (event) => {
+				console.log(event)
+			if (event.data) {
+				const data = JSON.parse(event.data);
+				console.log(data);
+			}
+			};
 },
   beforeUnmount() {
     // 断开 WebSocket 连接

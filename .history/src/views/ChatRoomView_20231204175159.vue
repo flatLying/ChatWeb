@@ -10,13 +10,9 @@
 			transform: 'translate(-50%, -50%)' /* 调整位置以确保真正的居中 */
 		}"
 	  :current-user-id="currentUserId"
-	  :room-id="roomId"
 	  :rooms="JSON.stringify(rooms)"
 	  :messages="JSON.stringify(messages)"
 	  :room-actions="JSON.stringify(roomActions)"
-	  :loading-rooms="loadingRooms"
-	  :rooms-loaded="roomsLoaded"
-	  :room-message="roomMessage"
 	  @send-message="sendMessage($event.detail[0])"
 	/>
 </template>
@@ -34,16 +30,47 @@ register()
       return {
 		socket: null,
         currentUserId: '1234',
-		loadingRooms: false,
-		roomsLoaded: true,
-		roomMessage: '',
-		roomId: '',
-		// roomsLoadedCount: 0,
-		messagesPerPage: 10,
-        rooms: [],
+        rooms: [{
+			roomId: '1',
+			roomName: 'Room 1',
+			avatar: 'assets/imgs/people.png',
+			unreadCount: 4,
+			index: 3,
+			lastMessage: {
+				_id: 'xyz',
+				content: 'Last message received',
+				senderId: '1234',
+				username: 'John Doe',
+				timestamp: '10:20',
+				saved: true,
+				distributed: false,
+				seen: false,
+				new: true
+				},
+			users: [
+			{
+				_id: '1234',
+				username: 'John Doe',
+				avatar: 'assets/imgs/doe.png',
+				status: {
+				state: 'online',
+				lastChanged: 'today, 14:30'
+				}
+			},
+			{
+				_id: '4321',
+				username: 'John Snow',
+				avatar: 'assets/imgs/snow.png',
+				status: {
+				state: 'offline',
+				lastChanged: '14 July, 20:00'
+				}
+			}
+    		],
+    		typingUsers: [ 4321 ]
+		}],
         messages: [],
         roomActions: [
-  		 {name: 'archiveRoom',title: 'Archive Room'},
           { name: 'inviteUser', title: 'Invite User' },
           { name: 'removeUser', title: 'Remove User' },
           { name: 'deleteRoom', title: 'Delete Room' }
@@ -71,46 +98,35 @@ register()
     }
 		
 	},
-	// computed: {
-	// 	loadedRooms() {
-	// 		return this.rooms.slice(0, this.roomsLoadedCount)
-	// 	}
-	// },
 	mounted() {
-		var that=this;
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
-			}).catch((error) => {
-				console.log(error);
-				});
-			request.post('http://localhost:8080/rooms', {
-			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response) {
-				that.rooms=response.data
-				// this.rooms=response.data;
+				console.log("服务器响应");
+    			console.log(response);
   			})
-		// 获取 token
-		const tokenStore = useTokenStore();
-		let token = tokenStore.token;
-		const wsAddress = `ws://localhost:8081/chat?token=${encodeURIComponent(token)}`;
+			// 获取 token
+			const tokenStore = useTokenStore();
+			let token = tokenStore.token;
+			const wsAddress = `ws://localhost:8081/chat?token=${encodeURIComponent(token)}`;
 
-		this.$connect(wsAddress, {
-		format: 'json',
-		reconnection: true,
-		reconnectionAttempts: 1,
-		reconnectionDelay: 3000,
-		});
-		// 连接 WebSocket
-		// this.$connect();
+			this.$connect(wsAddress, {
+			format: 'json',
+			reconnection: true,
+			reconnectionAttempts: 1,
+			reconnectionDelay: 3000,
+			});
+			// 连接 WebSocket
+			// this.$connect();
 
-		// 监听接收消息
-		this.$options.sockets.onmessage = (event) => {
-			console.log(event)
-		if (event.data) {
-			const data = JSON.parse(event.data);
-			console.log(data);
-		}
-	};
+			// 监听接收消息
+			this.$options.sockets.onmessage = (event) => {
+				console.log(event)
+			if (event.data) {
+				const data = JSON.parse(event.data);
+				console.log(data);
+			}
+			};
 },
   beforeUnmount() {
     // 断开 WebSocket 连接

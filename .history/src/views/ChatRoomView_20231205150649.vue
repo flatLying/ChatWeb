@@ -77,16 +77,18 @@ register()
 	// 	}
 	// },
 	mounted() {
-		var that=this;
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
-			}).catch((error) => {
-				console.log(error);
-				});
+			}).then(function (response) {
+				console.log("服务器响应");
+    			console.log(response);
+  			})
 			request.post('http://localhost:8080/rooms', {
 			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response) {
-				that.rooms=response.data
+				console.log(response.data)
+				let agentsList=response.data
+				this.rooms.splice(0,response.data.length,response.data)
 				// this.rooms=response.data;
   			})
 		// 获取 token

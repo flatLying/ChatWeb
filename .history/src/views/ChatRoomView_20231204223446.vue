@@ -38,9 +38,46 @@ register()
 		roomsLoaded: true,
 		roomMessage: '',
 		roomId: '',
-		// roomsLoadedCount: 0,
 		messagesPerPage: 10,
-        rooms: [],
+        rooms: [{
+			roomId: '1',
+			roomName: 'Room 1',
+			avatar: 'https://th.bing.com/th/id/OIP.-cdDkdSsW26cIvrT5QtwNQAAAA?rs=1&pid=ImgDetMain',
+			unreadCount: 4,
+			index: 3,
+			// lastMessage: {
+			// 	_id: 'xyz',
+			// 	content: 'Last message received',
+			// 	senderId: '1234',
+			// 	username: 'John Doe',
+			// 	timestamp: '10:20',
+			// 	saved: true,
+			// 	distributed: false,
+			// 	seen: false,
+			// 	new: true
+			// 	},
+			users: [
+			{
+				_id: '1234',
+				username: 'John Doe',
+				avatar: 'assets/imgs/doe.png',
+				status: {
+				state: 'online',
+				lastChanged: 'today, 14:30'
+				}
+			},
+			{
+				_id: '4321',
+				username: 'John Snow',
+				avatar: 'assets/imgs/snow.png',
+				status: {
+				state: 'offline',
+				lastChanged: '14 July, 20:00'  //最后登录日期
+				}
+			}
+    		],
+    		typingUsers: [ 4321 ]
+		}],
         messages: [],
         roomActions: [
   		 {name: 'archiveRoom',title: 'Archive Room'},
@@ -71,22 +108,23 @@ register()
     }
 		
 	},
-	// computed: {
-	// 	loadedRooms() {
-	// 		return this.rooms.slice(0, this.roomsLoadedCount)
-	// 	}
-	// },
 	mounted() {
-		var that=this;
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
-			}).catch((error) => {
-				console.log(error);
-				});
-			request.post('http://localhost:8080/rooms', {
+			}).then(function (response) {
+				console.log("服务器响应");
+    			console.log(response);
+  			})
+		request.post('http://localhost:8080/rooms', {
 			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response) {
-				that.rooms=response.data
+				console.log(response.data)
+				let agentsList=response.data
+				this.rooms.length=0
+				for (var i = 0; i < agentsList.length; i++) {
+				this.rooms.push(agentsList[i]);
+		
+				}	
 				// this.rooms=response.data;
   			})
 		// 获取 token
