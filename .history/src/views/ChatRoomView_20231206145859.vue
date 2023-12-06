@@ -26,7 +26,6 @@
 import { register } from 'vue-advanced-chat'
 import request from '@/utils/request';
 import VueNativeSock from 'vue-native-websocket-vue3'
-import { parseTimestamp, formatTimestamp } from '@/utils/dates'
 import {useTokenStore} from '../stores/counter.js';
 
 register()
@@ -37,7 +36,7 @@ register()
     data() {
       return {
 		socket: null,
-        currentUserId: '1',
+        currentUserId: 1,
 		loadingRooms: false,
 		roomsLoaded: true,
 		messagesLoaded: false,
@@ -74,36 +73,28 @@ register()
       this.$socket.sendObj(message);
 
     },
-	fetchMessages({ options = {} }) {
-			setTimeout(() => {
-				alert("currentUserId的类型为："+typeof(this.currentUserId))
-				if (options.reset) {
-					this.messages = this.addMessages(true)
-				} else {
-					this.messages = [...this.addMessages(), ...this.messages]
-					this.messagesLoaded = true
-				}
-				// this.addNewMessage()
-			})
+	resetMessages() {
+			this.messages = []
+			this.messagesLoaded = false
 		},
+	fetchMessages({ room, options = {} }) {
+			this.$emit('show-demo-options', false)
+			console.log("current user id")
+			console.log(this.currentUserId)
+			this.messages = []
+			this.messagesLoaded = false
+			this.selectedRoom = room.roomId
+            alert(this.selectedRoom)
+			let tmpmsg=[{
+					"files": null,
+					"content": "adf",
 
-		addMessages(reset) {
-			const messages = []
-
-			for (let i = 0; i < 30; i++) {
-				messages.push({
-					_id: reset ? i : this.messages.length + i,
-					content: `${reset ? '' : 'paginated'} message ${i + 1}`,
-					senderId: '4321',
-					username: 'John Doe',
-					date: '13 November',
-					timestamp: '10:20'
-				})
-			}
-
-			return messages
-		},
-
+					"senderId": 1,
+					"usersTag": [],
+					"replyMessage": null
+				}]
+			this.messages = [...tmpmsg]
+		},	
 	},
 	// computed: {
 	// 	loadedRooms() {
@@ -115,7 +106,7 @@ register()
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response){
-				that.currentUserId=String(response.data)
+				that.senderId=response.data
 			}).catch((error) => {
 				console.log(error);
 				});

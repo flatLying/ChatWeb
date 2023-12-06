@@ -26,21 +26,17 @@
 import { register } from 'vue-advanced-chat'
 import request from '@/utils/request';
 import VueNativeSock from 'vue-native-websocket-vue3'
-import { parseTimestamp, formatTimestamp } from '@/utils/dates'
 import {useTokenStore} from '../stores/counter.js';
 
 register()
 
   export default {
-
-	emits: ['show-demo-options'],
     data() {
       return {
 		socket: null,
-        currentUserId: '1',
+        currentUserId: '1234',
 		loadingRooms: false,
 		roomsLoaded: true,
-		messagesLoaded: false,
 		roomMessage: '',
 		roomId: '',
 		// roomsLoadedCount: 0,
@@ -74,36 +70,29 @@ register()
       this.$socket.sendObj(message);
 
     },
-	fetchMessages({ options = {} }) {
-			setTimeout(() => {
-				alert("currentUserId的类型为："+typeof(this.currentUserId))
-				if (options.reset) {
-					this.messages = this.addMessages(true)
-				} else {
-					this.messages = [...this.addMessages(), ...this.messages]
-					this.messagesLoaded = true
-				}
-				// this.addNewMessage()
-			})
+	resetMessages() {
+			this.messages = []
+			this.messagesLoaded = false
 		},
+	fetchMessages({ room, options = {} }) {
+			this.$emit('show-demo-options', false)
 
-		addMessages(reset) {
-			const messages = []
-
-			for (let i = 0; i < 30; i++) {
-				messages.push({
-					_id: reset ? i : this.messages.length + i,
-					content: `${reset ? '' : 'paginated'} message ${i + 1}`,
-					senderId: '4321',
-					username: 'John Doe',
-					date: '13 November',
-					timestamp: '10:20'
-				})
+			if (options.reset) {
+				this.resetMessages()
 			}
+			this.selectedRoom = room.roomId
+            alert(this.selectedRoom)
+			if (options.reset) this.messages = []
+			tmpmsg={
+					"files": null,
+					"content": "adf",
 
-			return messages
-		},
-
+					"senderId": 1,
+					"usersTag": [],
+					"replyMessage": null
+				}
+			this.messages = [...this.tmpmsg]
+		},	
 	},
 	// computed: {
 	// 	loadedRooms() {
@@ -114,8 +103,6 @@ register()
 		var that=this;
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
-			}).then(function (response){
-				that.currentUserId=String(response.data)
 			}).catch((error) => {
 				console.log(error);
 				});

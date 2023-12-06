@@ -1,0 +1,25 @@
+{
+    "files": null,
+    // "roomId": 6,
+    "content": "adf",
+    // "sendTime": "2023-12-05T19:20:56.381617300",
+    // "senderId": 1,
+    "usersTag": [],
+    // "receiverId": null,
+    "replyMessage": null
+}
+    {
+      _id: '7890',
+      indexId: 12092,
+      "roomId": 6,
+      "usersTag": [],
+      content: 'Message 1',
+      senderId: '1234',
+      username: 'John Doe',
+      avatar: 'assets/imgs/doe.png',
+      date: '13 November',
+      timestamp: '10:20',
+      files: [{}],
+      reactions: {[]},
+      replyMessage: {}
+    }

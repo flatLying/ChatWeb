@@ -76,7 +76,6 @@ register()
     },
 	fetchMessages({ options = {} }) {
 			setTimeout(() => {
-				alert("currentUserId的类型为："+typeof(this.currentUserId))
 				if (options.reset) {
 					this.messages = this.addMessages(true)
 				} else {
@@ -103,8 +102,7 @@ register()
 
 			return messages
 		},
-
-	},
+	
 	// computed: {
 	// 	loadedRooms() {
 	// 		return this.rooms.slice(0, this.roomsLoadedCount)
@@ -115,7 +113,7 @@ register()
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response){
-				that.currentUserId=String(response.data)
+				that.currentUserId=response.data
 			}).catch((error) => {
 				console.log(error);
 				});

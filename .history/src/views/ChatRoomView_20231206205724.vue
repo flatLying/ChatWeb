@@ -115,7 +115,7 @@ register()
 		request.get('http://localhost:8080/user/islogin', {
 			//headers:{authorization:sessionStorage.getItem("token")}
 			}).then(function (response){
-				that.currentUserId=String(response.data)
+				that.currentUserId=response.data
 			}).catch((error) => {
 				console.log(error);
 				});

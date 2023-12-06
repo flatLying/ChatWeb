@@ -1,0 +1,23 @@
+{
+    "files": null,
+    "content": "adf",
+
+    "senderId": 1,
+    "usersTag": [],
+    "replyMessage": null
+}
+    {
+      _id: '7890',
+      indexId: 12092,
+      "roomId": 6,
+      "usersTag": [],
+      content: 'Message 1',
+      senderId: '1234',
+      username: 'John Doe',
+      avatar: 'assets/imgs/doe.png',
+      date: '13 November',
+      timestamp: '10:20',
+      files: [{}],
+      reactions: {[]},
+      replyMessage: {}
+    }
